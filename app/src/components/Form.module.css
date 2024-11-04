@@ -5,6 +5,21 @@ body {
   font-family: 'Roboto', Arial, sans-serif;
 }
 
+/* Section title styles */
+.sectionTitle {
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-weight: 700 !important; 
+}
+
+/* Card styles */
+.card {
+  padding: 25px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 /* Form container styles */
 .formContainer {
   display: flex;
@@ -27,6 +42,7 @@ body {
 .formTitle {
   text-align: center;
   color: #2c3e50;
+  font-weight: 900 !important; 
   margin-bottom: 30px;
 }
 

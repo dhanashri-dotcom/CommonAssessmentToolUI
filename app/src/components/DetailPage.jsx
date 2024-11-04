@@ -5,6 +5,7 @@ import {
   Typography,
   Grid,
   TextField,
+  Card,
   Button,
   Checkbox,
   FormControlLabel,
@@ -125,9 +126,14 @@ const FormNew = () => {
         >
           Client Detail
         </Typography>
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={3}>
-            <TextField
+        <Card className={styles.card}>
+          <Typography variant="h6" className={styles.sectionTitle}>
+            Personal Information
+          </Typography>
+          <div style={{ marginBottom: '16px' }}></div>
+          <Grid container spacing={4}>
+            <Grid item xs={15} sm={3}>
+              <TextField
               label="Age"
               type="number"
               name="age"
@@ -136,92 +142,134 @@ const FormNew = () => {
               variant="outlined"
               fullWidth
               InputProps={{ inputProps: { min: 18, max: 65 } }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <FormControl fullWidth>
+              />
+            </Grid>
+            <Grid item xs={15} sm={3}>
+              <FormControl fullWidth>
               <InputLabel>Gender</InputLabel>
               <Select
-                name="gender"
-                value={formData.gender}
-                label="Gender"
-                onChange={handleChange}
+                  name="gender"
+                  value={formData.gender}
+                  label="Gender"
+                  onChange={handleChange}
               >
-                <MenuItem value="">
+                  <MenuItem value="">
                   <em>None</em>
-                </MenuItem>
-                <MenuItem value="M">Male</MenuItem>
-                <MenuItem value="F">Female</MenuItem>
+                  </MenuItem>
+                  <MenuItem value="M">Male</MenuItem>
+                  <MenuItem value="F">Female</MenuItem>
               </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Work Experience (years)"
-              name="work_experience"
-              type="number"
-              value={formData.work_experience}
-              onChange={handleChange}
-              className={styles.formField}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Canadian Work Experience (years)"
-              name="canada_workex"
-              type="number"
-              value={formData.canada_workex}
-              onChange={handleChange}
-              className={styles.formField}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
+              </FormControl>
+            </Grid>
+            <Grid item xs={15} sm={6}>
+              <TextField
               fullWidth
               label="Number of Dependents"
               name="dep_num"
               type="number"
               value={formData.dep_num}
               onChange={handleChange}
-            />
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <FormControl fullWidth>
-              <InputLabel>Citizen Status</InputLabel>
-              <Select
-                name="citizen_status"
-                value={formData.citizen_status}
+        </Card>
+        <Card className={styles.card}>
+          <Typography variant="h6" className={styles.sectionTitle}>
+            Work Experience
+          </Typography>
+          <div style={{ marginBottom: '16px' }}></div>
+          <Grid container spacing={4}>
+            <Grid item xs={15} sm={6}>
+              <TextField
+                fullWidth
+                label="Work Experience (years)"
+                name="work_experience"
+                type="number"
+                value={formData.work_experience}
                 onChange={handleChange}
-                label="Citizen Status"
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value="citizen">Citizen</MenuItem>
-                <MenuItem value="permanent_resident">
-                  Permanent Resident
-                </MenuItem>
-                <MenuItem value="temporary_resident">
-                  Temporary Resident
-                </MenuItem>
-              </Select>
-            </FormControl>
+              />
+            </Grid>
+            <Grid item xs={15} sm={6}>
+              <TextField
+                fullWidth
+                label="Canadian Work Experience (years)"
+                name="canada_workex"
+                type="number"
+                value={formData.canada_workex}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={15} sm={6}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={formData.currently_employed === "true"}
+                    onChange={handleChange}
+                    name="currently_employed"
+                  />
+                }
+                label="Currently Employed"
+              />
+            </Grid>
+            <Grid item xs={15} sm={6}>
+              <TextField
+                fullWidth
+                label="Time Unemployed (months)"
+                name="time_unemployed"
+                type="number"
+                value={formData.time_unemployed}
+                onChange={handleChange}
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={formData.canada_born === "true"}
+        </Card>
+        <Card className={styles.card}>
+          <Typography variant="h6" className={styles.sectionTitle}>
+            Citizenship
+          </Typography>
+          <div style={{ marginBottom: '16px' }}></div>
+          <Grid container spacing={4}>
+            <Grid item xs={15} sm={6}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={formData.canada_born === "true"}
+                    onChange={handleChange}
+                    name="canada_born"
+                  />
+                }
+                label="Born in Canada"
+              />
+            </Grid>
+            <Grid item xs={15} sm={6}>
+              <FormControl fullWidth>
+                <InputLabel>Citizen Status</InputLabel>
+                <Select
+                  name="citizen_status"
+                  value={formData.citizen_status}
                   onChange={handleChange}
-                  name="canada_born"
-                />
-              }
-              label="Born in Canada"
-            />
+                  label="Citizen Status"
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  <MenuItem value="citizen">Citizen</MenuItem>
+                  <MenuItem value="permanent_resident">
+                    Permanent Resident
+                  </MenuItem>
+                  <MenuItem value="temporary_resident">
+                    Temporary Resident
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
           </Grid>
-
+        </Card>
+        <Card className={styles.card}>
+          <Typography variant="h6" className={styles.sectionTitle}>
+            Education
+          </Typography>
+          <div style={{ marginBottom: '16px' }}></div>
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
               <InputLabel>Level of Schooling</InputLabel>
@@ -257,7 +305,7 @@ const FormNew = () => {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={15} sm={6}>
             <FormControlLabel
               control={
                 <Checkbox
@@ -269,42 +317,81 @@ const FormNew = () => {
               label="Attending School"
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={formData.fluent_english === "true"}
-                  onChange={handleChange}
-                  name="fluent_english"
-                />
-              }
-              label="Fluent in English"
-            />
+          <Grid container spacing={4}>
+            <Grid item xs={15} sm={6}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={formData.fluent_english === "true"}
+                    onChange={handleChange}
+                    name="fluent_english"
+                  />
+                }
+                label="Fluent in English"
+              />
+            </Grid>
+            <Grid item xs={15} sm={6}>
+              <TextField
+                fullWidth
+                label="Reading English Scale (0-10)"
+                name="reading_english_scale"
+                type="number"
+                value={formData.reading_english_scale}
+                onChange={handleChange}
+                InputProps={{ inputProps: { min: 0, max: 10 } }}
+              />
+            </Grid>
+            <Grid item xs={15} sm={6}>
+              <TextField
+                fullWidth
+                label="Speaking English Scale (0-10)"
+                name="speaking_english_scale"
+                type="number"
+                value={formData.speaking_english_scale}
+                onChange={handleChange}
+                InputProps={{ inputProps: { min: 0, max: 10 } }}
+              />
+            </Grid>
+            <Grid item xs={15} sm={6}>
+              <TextField
+                fullWidth
+                label="Writing English Scale (0-10)"
+                name="writing_english_scale"
+                type="number"
+                value={formData.writing_english_scale}
+                onChange={handleChange}
+                InputProps={{ inputProps: { min: 0, max: 10 } }}
+              />
+            </Grid>
+            <Grid item xs={15} sm={6}>
+              <TextField
+                fullWidth
+                label="Numeracy Scale (0-10)"
+                name="numeracy_scale"
+                type="number"
+                value={formData.numeracy_scale}
+                onChange={handleChange}
+                InputProps={{ inputProps: { min: 0, max: 10 } }}
+              />
+            </Grid>
+            <Grid item xs={15} sm={6}>
+              <TextField
+                fullWidth
+                label="Computer Scale (0-10)"
+                name="computer_scale"
+                type="number"
+                value={formData.computer_scale}
+                onChange={handleChange}
+                InputProps={{ inputProps: { min: 0, max: 10 } }}
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={formData.currently_employed === "true"}
-                  onChange={handleChange}
-                  name="currently_employed"
-                />
-              }
-              label="Currently Employed"
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Time Unemployed (months)"
-              name="time_unemployed"
-              type="number"
-              value={formData.time_unemployed}
-              onChange={handleChange}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
+        </Card>
+        <Card className={styles.card}>
+          <Typography variant="h6" className={styles.sectionTitle}>
+            Other
+          </Typography>
+          <Grid item xs={15} sm={6}>
             <FormControlLabel
               control={
                 <Checkbox
@@ -316,7 +403,7 @@ const FormNew = () => {
               label="Has Transportation"
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={15} sm={6}>
             <FormControlLabel
               control={
                 <Checkbox
@@ -328,74 +415,7 @@ const FormNew = () => {
               label="Is a Caregiver"
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <FormControl fullWidth>
-              <InputLabel>Housing</InputLabel>
-              <Select
-                name="housing"
-                label="housing"
-                value={formData.housing}
-                onChange={handleChange}
-              >
-                <MenuItem value="Renting-private">Renting-private</MenuItem>
-                <MenuItem value="Renting-subsidized">
-                  Renting-subsidized
-                </MenuItem>
-                <MenuItem value="Boarding or lodging">
-                  Boarding or lodging
-                </MenuItem>
-                <MenuItem value="Homeowner">Homeowner</MenuItem>
-                <MenuItem value="Living with family/friend">
-                  Living with family/friend
-                </MenuItem>
-                <MenuItem value="Institution">Institution</MenuItem>
-                <MenuItem value="Temporary second residence">
-                  Temporary second residence
-                </MenuItem>
-                <MenuItem value="Band-owned home">Band-owned home</MenuItem>
-                <MenuItem value="Homeless or transient">
-                  Homeless or transient
-                </MenuItem>
-                <MenuItem value="Emergency hostel">Emergency hostel</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <FormControl fullWidth>
-              <InputLabel>Source of Income</InputLabel>
-              <Select
-                name="income_source"
-                label="Source of Income"
-                value={formData.income_source}
-                onChange={handleChange}
-              >
-                <MenuItem value="No Source of Income">
-                  No Source of Income
-                </MenuItem>
-                <MenuItem value="Employment Insurance">
-                  Employment Insurance
-                </MenuItem>
-                <MenuItem value="Ontario Works applied or receiving">
-                  Ontario Works applied or receiving
-                </MenuItem>
-                <MenuItem value="Ontario Disability Support Program applied or receiving">
-                  Ontario Disability Support Program applied or receiving
-                </MenuItem>
-                <MenuItem value="Dependent of someone receiving OW or ODSP">
-                  Dependent of someone receiving OW or ODSP
-                </MenuItem>
-                <MenuItem value="Crown Ward">Crown Ward</MenuItem>
-                <MenuItem value="Employment">Employment</MenuItem>
-                <MenuItem value="Band-owned home">Band-owned home</MenuItem>
-                <MenuItem value="Homeless or transient">
-                  Homeless or transient
-                </MenuItem>
-                <MenuItem value="Self-Employment">Self-Employment</MenuItem>
-                <MenuItem value="Other">Other</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={15} sm={6}>
             <FormControlLabel
               control={
                 <Checkbox
@@ -407,7 +427,7 @@ const FormNew = () => {
               label="Has Felony"
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={15} sm={6}>
             <FormControlLabel
               control={
                 <Checkbox
@@ -419,7 +439,7 @@ const FormNew = () => {
               label="Substance Use"
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={15} sm={6}>
             <FormControlLabel
               control={
                 <Checkbox
@@ -433,62 +453,76 @@ const FormNew = () => {
               className={styles.formField}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Reading English Scale (0-10)"
-              name="reading_english_scale"
-              type="number"
-              value={formData.reading_english_scale}
-              onChange={handleChange}
-              InputProps={{ inputProps: { min: 0, max: 10 } }}
-            />
+          <Grid container spacing={4}>
+            <Grid item xs={15} sm={6}>
+              <FormControl fullWidth>
+                <InputLabel>Housing</InputLabel>
+                <Select
+                  name="housing"
+                  label="housing"
+                  value={formData.housing}
+                  onChange={handleChange}
+                >
+                  <MenuItem value="Renting-private">Renting-private</MenuItem>
+                  <MenuItem value="Renting-subsidized">
+                    Renting-subsidized
+                  </MenuItem>
+                  <MenuItem value="Boarding or lodging">
+                    Boarding or lodging
+                  </MenuItem>
+                  <MenuItem value="Homeowner">Homeowner</MenuItem>
+                  <MenuItem value="Living with family/friend">
+                    Living with family/friend
+                  </MenuItem>
+                  <MenuItem value="Institution">Institution</MenuItem>
+                  <MenuItem value="Temporary second residence">
+                    Temporary second residence
+                  </MenuItem>
+                  <MenuItem value="Band-owned home">Band-owned home</MenuItem>
+                  <MenuItem value="Homeless or transient">
+                    Homeless or transient
+                  </MenuItem>
+                  <MenuItem value="Emergency hostel">Emergency hostel</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={15} sm={6}>
+              <FormControl fullWidth>
+                <InputLabel>Source of Income</InputLabel>
+                <Select
+                  name="income_source"
+                  label="Source of Income"
+                  value={formData.income_source}
+                  onChange={handleChange}
+                >
+                  <MenuItem value="No Source of Income">
+                    No Source of Income
+                  </MenuItem>
+                  <MenuItem value="Employment Insurance">
+                    Employment Insurance
+                  </MenuItem>
+                  <MenuItem value="Ontario Works applied or receiving">
+                    Ontario Works applied or receiving
+                  </MenuItem>
+                  <MenuItem value="Ontario Disability Support Program applied or receiving">
+                    Ontario Disability Support Program applied or receiving
+                  </MenuItem>
+                  <MenuItem value="Dependent of someone receiving OW or ODSP">
+                    Dependent of someone receiving OW or ODSP
+                  </MenuItem>
+                  <MenuItem value="Crown Ward">Crown Ward</MenuItem>
+                  <MenuItem value="Employment">Employment</MenuItem>
+                  <MenuItem value="Band-owned home">Band-owned home</MenuItem>
+                  <MenuItem value="Homeless or transient">
+                    Homeless or transient
+                  </MenuItem>
+                  <MenuItem value="Self-Employment">Self-Employment</MenuItem>
+                  <MenuItem value="Other">Other</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Speaking English Scale (0-10)"
-              name="speaking_english_scale"
-              type="number"
-              value={formData.speaking_english_scale}
-              onChange={handleChange}
-              InputProps={{ inputProps: { min: 0, max: 10 } }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Writing English Scale (0-10)"
-              name="writing_english_scale"
-              type="number"
-              value={formData.writing_english_scale}
-              onChange={handleChange}
-              InputProps={{ inputProps: { min: 0, max: 10 } }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Numeracy Scale (0-10)"
-              name="numeracy_scale"
-              type="number"
-              value={formData.numeracy_scale}
-              onChange={handleChange}
-              InputProps={{ inputProps: { min: 0, max: 10 } }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Computer Scale (0-10)"
-              name="computer_scale"
-              type="number"
-              value={formData.computer_scale}
-              onChange={handleChange}
-              InputProps={{ inputProps: { min: 0, max: 10 } }}
-            />
-          </Grid>
-        </Grid>
+        </Card>
         <Grid
           container
           spacing={2}
