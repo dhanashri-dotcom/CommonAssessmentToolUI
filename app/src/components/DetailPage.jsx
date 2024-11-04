@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import axios from "axios";
 import {
   Typography,
@@ -17,6 +17,7 @@ import {
 import styles from "./Form.module.css";
 
 const FormNew = () => {
+  const { clientId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const [formData, setFormData] = useState({
@@ -46,12 +47,35 @@ const FormNew = () => {
     need_mental_health_support_bool: "false",
   });
 
+  // useEffect(() => {
+  //   // If there's form data in the location state, use it to initialize the form
+  //   if (location.state && location.state.formData) {
+  //     setFormData(location.state.formData);
+  //   }
+  // }, [location.state]);
+
   useEffect(() => {
-    // If there's form data in the location state, use it to initialize the form
-    if (location.state && location.state.formData) {
-      setFormData(location.state.formData);
+    if (!clientId) {
+      console.error("Client ID is undefined");
+      return;
     }
-  }, [location.state]);
+    // Fetch client details from the backend using the client ID
+    const fetchClientDetails = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3001/api/clients/${clientId}`);
+        setFormData((prevFormData) => ({
+          ...prevFormData, // Include all default values
+          ...response.data  // Override with any values fetched from the server
+        }));
+      } catch (error) {
+        console.error("Error fetching client details:", error);
+      }
+    };
+
+    if (clientId) {
+      fetchClientDetails();
+    }
+  }, [clientId]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

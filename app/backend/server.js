@@ -10,9 +10,9 @@ app.use(bodyParser.json());
 
 // Mock client data
 const clients = [
-  { id: 1, name: "John Doe", age: 30, gender: "Male" },
-  { id: 1, name: "John Smith", age: 30, gender: "Male" },
-  { id: 1, name: "John Johnson", age: 30, gender: "Male" },
+  { id: 1, name: "John Doe", age: 30, gender: "M", citizen_status: "permanent_resident" },
+  // { id: 1, name: "John Smith", age: 30, gender: "Male" },
+  // { id: 1, name: "John Johnson", age: 30, gender: "Male" },
   { id: 2, name: "Jane Smith", age: 25, gender: "Female" },
   { id: 3, name: "Alice Johnson", age: 35, gender: "Female" },
   { id: 4, name: "Michael Brown", age: 40, gender: "Male" },
@@ -31,6 +31,19 @@ app.get('/api/clients/search', (req, res) => {
   );
 
   res.json(matchingClients);
+});
+
+// API endpoint to get a specific client by ID
+app.get('/api/clients/:id', (req, res) => {
+  const { id } = req.params;
+  const client = clients.find(client => client.id === parseInt(id, 10));
+
+  if (!client) {
+    console.log('Client not found'); // Log when the client is not found
+    return res.status(404).json({ error: "Client not found" });
+  }
+
+  res.json(client);
 });
 
 app.post('/api/submit-form', (req, res) => {

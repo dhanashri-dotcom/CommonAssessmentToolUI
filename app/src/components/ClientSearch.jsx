@@ -33,7 +33,7 @@ function ClientSearch() {
   };
 
   // Function to navigate to client details page
-  const handleClientClick = (clientId) => {
+  const handleClientClick = async (clientId) => {
     navigate(`/client/${clientId}`);
   };
 

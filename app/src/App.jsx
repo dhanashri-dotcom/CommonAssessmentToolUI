@@ -21,6 +21,7 @@ function App() {
             <Route path="/results" element={<ResultPage />} />
             <Route path="/clients" element={<ClientSearch />} />
             <Route path="/client/:clientId" element={<DetailPage />} />
+            <Route path="/client/:clientId" element={<FormNew />} />
           </Routes>
         </main>
         <Footer />
