@@ -3,24 +3,53 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {
   Grid,
   Card,
-  TextField,
   Typography,
-  FormControlLabel,
-  Button,
   Box,
-  Checkbox,
+  IconButton,
+  Button,
+  FormControl,
   Select,
   MenuItem,
-  FormControl,
-  InputLabel,
+  Divider,
 } from "@mui/material";
 import axios from 'axios';
-import styles from "./Form.module.css";
+import styles from "./Form.detail.css";
 
 function Client() {
   const navigate = useNavigate();
   const { id } = useParams();
   const [open, setOpen] = useState(true);
+  
+  // Map of field names to their labels
+  const fieldLabels = {
+    firstName: "First Name",
+    lastName: "Last Name",
+    age: "Age",
+    gender: "Gender",
+    work_experience: "Work Experience",
+    canada_workex: "Canada Work Experience",
+    dep_num: "Number of Dependents",
+    canada_born: "Born in Canada",
+    citizen_status: "Citizen Status",
+    level_of_schooling: "Level of Schooling",
+    fluent_english: "Fluent in English",
+    reading_english_scale: "Reading English Scale",
+    speaking_english_scale: "Speaking English Scale",
+    writing_english_scale: "Writing English Scale",
+    numeracy_scale: "Numeracy Scale",
+    computer_scale: "Computer Scale",
+    transportation_bool: "Has Transportation",
+    caregiver_bool: "Is a Caregiver",
+    housing: "Housing",
+    income_source: "Source of Income",
+    felony_bool: "Has Felony",
+    attending_school: "Attending School",
+    currently_employed: "Currently Employed",
+    substance_use: "Substance Use",
+    time_unemployed: "Time Unemployed",
+    need_mental_health_support_bool: "Needs Mental Health Support",
+  };
+
   const [selectedUser, setSelectedUser] = useState({
     firstName: "",
     lastName: "",
@@ -50,6 +79,8 @@ function Client() {
     need_mental_health_support_bool: "false",
   });
 
+  const [editMode, setEditMode] = useState({});
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -63,24 +94,48 @@ function Client() {
     fetchUserData();
   }, [id]);
 
-
-  const handleSave = async () => {
-    try {
-      // Update existing user
-      const response = await axios.put(`http://localhost:3001/api/update-user/${id}`, selectedUser);
-      console.log(response.data.message);
-      alert('User updated successfully!');
-    } catch (error) {
-      console.error("Error saving user:", error);
-      alert('Failed to save user.');
-    }
-    setOpen(false);
+  const handleEditClick = (field) => {
+    setEditMode((prev) => ({
+      ...prev,
+      [field]: true,
+    }));
   };
 
+  const handleConfirmClick = async (field) => {
+    try {
+      const updatedData = { [field]: selectedUser[field] };
+      await axios.put(`http://localhost:3001/api/update-user/${id}`, updatedData);
 
+      setEditMode((prev) => ({
+        ...prev,
+        [field]: false,
+      }));
+      alert(`${fieldLabels[field]} updated successfully!`);
+    } catch (error) {
+      console.error("Error updating user data:", error);
+      alert('Failed to update user.');
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setSelectedUser({
+      ...selectedUser,
+      [name]: type === 'checkbox' ? (checked ? "true" : "false") : value,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check for unconfirmed fields
+    const unconfirmedFields = Object.keys(editMode).filter((field) => editMode[field]);
+    if (unconfirmedFields.length > 0) {
+      const unconfirmedFieldLabels = unconfirmedFields.map(field => `"${fieldLabels[field]}" Field`);
+      alert(`${unconfirmedFieldLabels.join(", ")} edit not confirmed.`);
+      return;
+    }
+
     try {
       const response = await axios.post('http://localhost:3001/api/work-score', selectedUser);
 
@@ -94,454 +149,170 @@ function Client() {
     }
   };
 
+  const renderEditableField = (fieldName, label, type = "text", selectOptions = null) => (
+    <Grid item xs={12} sm={6} key={fieldName}>
+      <div className={`${styles.inputContainer} input-container`}>
+        <div className={`${styles.labelContainer} label-container`}>
+          <Typography variant="subtitle1" style={{ color: '#888', fontWeight: 500 }}>
+            {label}
+          </Typography>
+          {!editMode[fieldName] && (
+            <IconButton onClick={() => handleEditClick(fieldName)} size="small" className={styles.editIconButton}>
+              <i className="fas fa-edit edit-icon" />
+            </IconButton>
+          )}
+        </div>
+        {!editMode[fieldName] ? (
+          <Typography variant="body1">
+            {selectedUser[fieldName]}
+          </Typography>
+        ) : (
+          <Box className={styles.editFieldContainer} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {type === "boolean" ? (
+              <FormControl className={styles.booleanDropdown}>
+                <Select
+                  name={fieldName}
+                  value={selectedUser[fieldName]}
+                  onChange={handleChange}
+                >
+                  <MenuItem value="true">true</MenuItem>
+                  <MenuItem value="false">false</MenuItem>
+                </Select>
+              </FormControl>
+            ) : selectOptions ? (
+              <FormControl fullWidth>
+                <Select
+                  name={fieldName}
+                  value={selectedUser[fieldName]}
+                  onChange={handleChange}
+                >
+                  {selectOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              <input
+                type={type}
+                name={fieldName}
+                value={selectedUser[fieldName]}
+                onChange={handleChange}
+                className={styles.editInputField}
+              />
+            )}
+            <IconButton onClick={() => handleConfirmClick(fieldName)} size="small" className={styles.confirmIconButton}>
+              <i className="fas fa-check confirm-icon" />
+            </IconButton>
+          </Box>
+        )}
+      </div>
+    </Grid>
+  );
 
   return (
     <Box sx={{ width: 800, margin: '50px auto' }}>
-      <Typography
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+      <Card className={styles.card}>
+        <Typography
           variant="h4"
           component="h2"
           gutterBottom
-          className={styles.formTitle}
+          className="form-title"
         >
           Client Detail
-      </Typography>
-      <Card className={styles.card}>
-        <Typography variant="h6" className={styles.sectionTitle}>
-            Personal Information
         </Typography>
+          
+        <div className={`${styles.sectionTitle} section-title`}>Personal Info</div>
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="First Name"
-              type="text"
-              value={selectedUser.firstName}
-              onChange={(e) => setSelectedUser({ ...selectedUser, firstName: e.target.value })}
-              variant="outlined"
-              fullWidth
-              InputLabelProps={{ shrink: true }} // Ensures label shrinks when there is content
-
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Last Name"
-              type="text"
-              value={selectedUser.lastName}
-              onChange={(e) => setSelectedUser({ ...selectedUser, lastName: e.target.value })}
-              variant="outlined"
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <TextField
-              label="Age"
-              type="number"
-              name="age"
-              value={selectedUser.age}
-              onChange={(e) => setSelectedUser({ ...selectedUser, age: e.target.value })}
-              variant="outlined"
-              fullWidth
-              InputProps={{ inputProps: { min: 18, max: 65 } }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <FormControl fullWidth>
-              <InputLabel>Gender</InputLabel>
-              <Select
-                name="gender"
-                value={selectedUser.gender}
-                label="Gender"
-                onChange={(e) => setSelectedUser({ ...selectedUser, gender: e.target.value })}
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value="M">Male</MenuItem>
-                <MenuItem value="F">Female</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Number of Dependents"
-              name="dep_num"
-              type="number"
-              value={selectedUser.dep_num}
-              onChange={(e) => setSelectedUser({ ...selectedUser, dep_num: e.target.value })}
-            />
-          </Grid>
+          {renderEditableField("firstName", "First Name")}
+          {renderEditableField("lastName", "Last Name")}
+          {renderEditableField("age", "Age", "number")}
+          {renderEditableField("gender", "Gender", "text", [
+            { value: "", label: "None" },
+            { value: "M", label: "Male" },
+            { value: "F", label: "Female" },
+          ])}
+          {renderEditableField("dep_num", "Number of Dependents", "number")}
         </Grid>
-      </Card>
-      <Card className={styles.card}>
-        <Typography variant="h6" className={styles.sectionTitle}>
-          Work Experience
-        </Typography>
-          <Grid container spacing={4}>
-            <Grid item xs={12} sm={6}>
-            <TextField
-              label="Work Experience"
-              name="work_experience"
-              type="number"
-              value={selectedUser.work_experience}
-              onChange={(e) => setSelectedUser({ ...selectedUser, work_experience: e.target.value })}
-              className={styles.formField}
-              fullWidth
-            />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Canada Work Experience"
-                value={selectedUser.canada_workex}
-                onChange={(e) => setSelectedUser({ ...selectedUser, canada_workex: e.target.value })}
-                className={styles.formField}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={selectedUser.currently_employed === "true"}
-                    onChange={(e) => setSelectedUser({ ...selectedUser, currently_employed: e.target.checked ? "true" : "false" })}
-                    name="currently_employed"
-                  />
-                }
-                label="Currently Employed"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Time Unemployed (months)"
-                name="time_unemployed"
-                type="number"
-                value={selectedUser.time_unemployed}
-                onChange={(e) => setSelectedUser({ ...selectedUser, time_unemployed: e.target.value })}
-              />
-            </Grid>
-          </Grid>
-        </Card>
-        <Card className={styles.card}>
-          <Typography variant="h6" className={styles.sectionTitle}>
-            Citizenship
-          </Typography>
-          <div style={{ marginBottom: '16px' }}></div>
-          <Grid container spacing={4}>
-          <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Citizen Status</InputLabel>
-                <Select
-                  name="citizen_status"
-                  value={selectedUser.citizen_status}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, citizen_status: e.target.value })}
-                  label="Citizen Status"
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  <MenuItem value="citizen">Citizen</MenuItem>
-                  <MenuItem value="permanent_resident">
-                    Permanent Resident
-                  </MenuItem>
-                  <MenuItem value="temporary_resident">
-                    Temporary Resident
-                  </MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={selectedUser.canada_born === "true"}
-                    onChange={(e) => setSelectedUser({ ...selectedUser, canada_born: e.target.checked ? "true" : "false"})}
-                    name="canada_born"
-                  />
-                }
-                label="Born in Canada"
-              />
-            </Grid>
-          </Grid>
-        </Card>
-        <Card className={styles.card}>
-          <Typography variant="h6" className={styles.sectionTitle}>
-            Education
-          </Typography>
-          <div style={{ marginBottom: '16px' }}></div>
-          <Grid container spacing={4}>
-            <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Level of Schooling</InputLabel>
-                  <Select
-                    name="level_of_schooling"
-                    value={selectedUser.level_of_schooling}
-                    onChange={(e) => setSelectedUser({ ...selectedUser, level_of_schooling: e.target.value })}
-                    label="Level of Schooling"
-                  >
-                    <MenuItem value="Grade 0-8">Grade 0-8</MenuItem>
-                    <MenuItem value="Grade 9">Grade 9</MenuItem>
-                    <MenuItem value="Grade 10">Grade 10</MenuItem>
-                    <MenuItem value="Grade 11">Grade 11</MenuItem>
+        <div className={`${styles.sectionTitle} section-title`}>Work Experience</div>
+        <Grid container spacing={4}>
+          {renderEditableField("work_experience", "Work Experience", "number")}
+          {renderEditableField("canada_workex", "Canada Work Experience", "number")}
+          {renderEditableField("currently_employed", "Currently Employed", "boolean")}
+          {renderEditableField("time_unemployed", "Time Unemployed (months)", "number")}
+        </Grid>
 
-                    <MenuItem value="Grade 12 or equivalent">
-                      Grade 12 or equivalent
-                    </MenuItem>
-                    <MenuItem value="OAC or Grade 13">OAC or Grade 13</MenuItem>
-                    <MenuItem value="Some college">Some college</MenuItem>
-                    <MenuItem value="Some university">Some university</MenuItem>
-                    <MenuItem value="Some apprenticeship">
-                      Some apprenticeship
-                    </MenuItem>
-                    <MenuItem value="Certificate of Apprenticeship">
-                      Certificate of Apprenticeship
-                    </MenuItem>
-                    <MenuItem value="Journeyperson">Journeyperson</MenuItem>
-                    <MenuItem value="Certificate/Diploma">
-                      Certificate/Diploma
-                    </MenuItem>
-                    <MenuItem value="Bachelor’s degree">Bachelor’s degree</MenuItem>
-                    <MenuItem value="Post graduate">Post graduate</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={selectedUser.attending_school === "true"}
-                      onChange={(e) => setSelectedUser({ ...selectedUser, attending_school: e.target.checked ? "true" : "false"})}
-                      name="attending_school"
-                    />
-                  }
-                  label="Attending School"
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={selectedUser.fluent_english === "true"}
-                      onChange={(e) => setSelectedUser({ ...selectedUser, fluent_english: e.target.value })}
-                      name="fluent_english"
-                    />
-                  }
-                  label="Fluent in English"
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Reading English Scale (0-10)"
-                name="reading_english_scale"
-                type="number"
-                value={selectedUser.reading_english_scale}
-                onChange={(e) => setSelectedUser({ ...selectedUser, reading_english_scale: e.target.value })}
-                InputProps={{ inputProps: { min: 0, max: 10 } }}
-              />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Speaking English Scale (0-10)"
-                  name="speaking_english_scale"
-                  type="number"
-                  value={selectedUser.speaking_english_scale}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, speaking_english_scale: e.target.value })}
-                  InputProps={{ inputProps: { min: 0, max: 10 } }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Writing English Scale (0-10)"
-                  name="writing_english_scale"
-                  type="number"
-                  value={selectedUser.writing_english_scale}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, writing_english_scale: e.target.value })}
-                  InputProps={{ inputProps: { min: 0, max: 10 } }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Numeracy Scale (0-10)"
-                  name="numeracy_scale"
-                  type="number"
-                  value={selectedUser.numeracy_scale}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, numeracy_scale: e.target.value })}
-                  InputProps={{ inputProps: { min: 0, max: 10 } }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Computer Scale (0-10)"
-                  name="computer_scale"
-                  type="number"
-                  value={selectedUser.computer_scale}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, computer_scale: e.target.value })}
-                  InputProps={{ inputProps: { min: 0, max: 10 } }}
-                />
-              </Grid>
-          </Grid>
-        </Card>
-        <Card className={styles.card}>
-          <Typography variant="h6" className={styles.sectionTitle}>
-            Other
-          </Typography>
-          <Grid container spacing={4}>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Housing</InputLabel>
-                <Select
-                  name="housing"
-                  label="housing"
-                  value={selectedUser.housing}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, housing: e.target.value })}
-                >
-                  <MenuItem value="Renting-private">Renting-private</MenuItem>
-                  <MenuItem value="Renting-subsidized">
-                    Renting-subsidized
-                  </MenuItem>
-                  <MenuItem value="Boarding or lodging">
-                    Boarding or lodging
-                  </MenuItem>
-                  <MenuItem value="Homeowner">Homeowner</MenuItem>
-                  <MenuItem value="Living with family/friend">
-                    Living with family/friend
-                  </MenuItem>
-                  <MenuItem value="Institution">Institution</MenuItem>
-                  <MenuItem value="Temporary second residence">
-                    Temporary second residence
-                  </MenuItem>
-                  <MenuItem value="Band-owned home">Band-owned home</MenuItem>
-                  <MenuItem value="Homeless or transient">
-                    Homeless or transient
-                  </MenuItem>
-                  <MenuItem value="Emergency hostel">Emergency hostel</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Source of Income</InputLabel>
-                <Select
-                  name="income_source"
-                  label="Source of Income"
-                  value={selectedUser.income_source}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, income_source: e.target.value })}
-                >
-                  <MenuItem value="No Source of Income">
-                    No Source of Income
-                  </MenuItem>
-                  <MenuItem value="Employment Insurance">
-                    Employment Insurance
-                  </MenuItem>
-                  <MenuItem value="Ontario Works applied or receiving">
-                    Ontario Works applied or receiving
-                  </MenuItem>
-                  <MenuItem value="Ontario Disability Support Program applied or receiving">
-                    Ontario Disability Support Program applied or receiving
-                  </MenuItem>
-                  <MenuItem value="Dependent of someone receiving OW or ODSP">
-                    Dependent of someone receiving OW or ODSP
-                  </MenuItem>
-                  <MenuItem value="Crown Ward">Crown Ward</MenuItem>
-                  <MenuItem value="Employment">Employment</MenuItem>
-                  <MenuItem value="Band-owned home">Band-owned home</MenuItem>
-                  <MenuItem value="Homeless or transient">
-                    Homeless or transient
-                  </MenuItem>
-                  <MenuItem value="Self-Employment">Self-Employment</MenuItem>
-                  <MenuItem value="Other">Other</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={selectedUser.transportation_bool === "true"}
-                    onChange={(e) => setSelectedUser({ ...selectedUser, transportation_bool: e.target.checked ? "true" : "false"  })}
-                    name="transportation_bool"
-                  />
-                }
-                label="Has Transportation"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={selectedUser.caregiver_bool === "true"}
-                    onChange={(e) =>
-                      setSelectedUser({ ...selectedUser, caregiver_bool: e.target.checked ? "true" : "false" })
-                    }
-                    name="caregiver_bool"
-                  />
-                }
-                label="Is a Caregiver"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={selectedUser.felony_bool === "true"}
-                    onChange={(e) => setSelectedUser({ ...selectedUser, felony_bool: e.target.checked ? "true" : "false" })}
-                    name="felony_bool"
-                  />
-                }
-                label="Has Felony"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                  checked={selectedUser.substance_use === "true"} // Compare with string "true" to determine checked state
-                  onChange={(e) => setSelectedUser({ ...selectedUser, substance_use: e.target.checked ? "true" : "false" })} // Convert to string
-                    name="substance_use"
-                  />
-                }
-                label="Substance Use"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={selectedUser.need_mental_health_support_bool  === "true"}
-                    onChange={(e) => setSelectedUser({ ...selectedUser, need_mental_health_support_bool: e.target.checked ? "true" : "false" })}
-                    name="need_mental_health_support_bool"
-                    className={styles.checkbox}
-                  />
-                }
-                label="Needs Mental Health Support"
-                className={styles.formField}
-              />
-            </Grid>
-          </Grid>
-        </Card>
-      <Grid
-          container
-          spacing={2}
-          justifyContent="flex-end"
-          style={{ marginTop: "20px" }}
+        <div className={`${styles.sectionTitle} section-title`}>Citizenship</div>
+        <Grid container spacing={4}>
+          {renderEditableField("citizen_status", "Citizen Status", "text", [
+            { value: "", label: "None" },
+            { value: "citizen", label: "Citizen" },
+            { value: "permanent_resident", label: "Permanent Resident" },
+            { value: "temporary_resident", label: "Temporary Resident" },
+          ])}
+          {renderEditableField("canada_born", "Born in Canada", "boolean")}
+        </Grid>
+
+        <div className={`${styles.sectionTitle} section-title`}>Education</div>
+        <Grid container spacing={4}>
+          {renderEditableField("attending_school", "Attending School", "boolean")}
+          {renderEditableField("fluent_english", "Fluent in English", "boolean")}
+          {renderEditableField("level_of_schooling", "Level of Schooling", "text", [
+            { value: "Grade 0-8", label: "Grade 0-8" },
+            { value: "Grade 9", label: "Grade 9" },
+            { value: "Grade 10", label: "Grade 10" },
+            { value: "Grade 11", label: "Grade 11" },
+            { value: "Grade 12 or equivalent", label: "Grade 12 or equivalent" },
+            { value: "Some college", label: "Some college" },
+            { value: "Bachelor’s degree", label: "Bachelor’s degree" },
+            { value: "Post graduate", label: "Post graduate" },
+          ])}
+          {renderEditableField("reading_english_scale", "Reading English Scale (0-10)", "number")}
+          {renderEditableField("speaking_english_scale", "Speaking English Scale (0-10)", "number")}
+          {renderEditableField("writing_english_scale", "Writing English Scale (0-10)", "number")}
+          {renderEditableField("numeracy_scale", "Numeracy Scale (0-10)", "number")}
+          {renderEditableField("computer_scale", "Computer Scale (0-10)", "number")}
+        </Grid>
+
+        <div className={`${styles.sectionTitle} section-title`} >Other</div>
+        <Grid container spacing={4} sx={{ paddingBottom: 3 }}>
+          {renderEditableField("housing", "Housing", "text", [
+            { value: "Renting-private", label: "Renting-private" },
+            { value: "Renting-subsidized", label: "Renting-subsidized" },
+            { value: "Homeowner", label: "Homeowner" },
+            { value: "Institution", label: "Institution" },
+          ])}
+          {renderEditableField("income_source", "Source of Income", "text", [
+            { value: "Employment", label: "Employment" },
+            { value: "Self-Employment", label: "Self-Employment" },
+            { value: "Ontario Works applied or receiving", label: "Ontario Works applied or receiving" },
+          ])}
+          {renderEditableField("transportation_bool", "Has Transportation", "boolean")}
+          {renderEditableField("caregiver_bool", "Is a Caregiver", "boolean")}
+          {renderEditableField("felony_bool", "Has Felony", "boolean")}
+          {renderEditableField("substance_use", "Substance Use", "boolean")}
+          {renderEditableField("need_mental_health_support_bool", "Needs Mental Health Support", "boolean")}
+        </Grid>
+
+      </Card>
+
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: 3 }}>
+        <Button
+          type="submit"
+          variant="contained"
+          color="secondary"
+          onClick={handleSubmit}
+          sx={{
+            minWidth: '200px', 
+            height: '60px',  
+            fontSize: '1rem' 
+          }}
         >
-      <Grid item xs={12} sm={3}>
-      <Button type="update" variant="contained" color="primary" onClick={handleSave} fullWidth>
-              Update
-      </Button>
-      </Grid>
-      <Grid item xs={12} sm={3}>
-      <Button type="submit" variant="contained" color="secondary" onClick={handleSubmit} fullWidth>
-              See your score
-      </Button>
-      </Grid>
-    </Grid>
+          See your score
+        </Button>
+      </Box>
     </Box>
   );
 }
