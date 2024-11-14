@@ -1,47 +1,60 @@
 .centered-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #f4f4f9;
-    color: #333;
-    font-family: 'Arial', sans-serif;
-    padding-top: 20px; 
-  }
-  
-  .form-container {
-    background: white;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    width: 80%;
-    max-width: 500px;
-    margin-top: 10px; 
-  }
-  
-  .result-container {
-    margin-top: 10px;
-    padding: 20px;
-    background: #e2e2e2;
-    border-radius: 8px;
-    width: 100%;
-    text-align: center;
-  }
-  
-  .client-item {
-    padding: 12px;
-    margin-bottom: 8px;
-    background-color: #3498db;
-    color: #ecf0f1;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-    font-weight: bold;
-  }
-  
-  .client-item:hover {
-    background-color: #2980b9;
-  }
-  
-  .error-message {
-    color: red;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f4f4f9;
+  color: #333;
+  font-family: 'Arial', sans-serif;
+  padding-top: 80px;
+  padding-bottom: 60px;
+  width: 100%;
+}
+
+.client-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 32px;
+  justify-content: center;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.client-card {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+  margin: 20px;
+}
+
+.client-card:hover {
+  transform: translateY(-4px);
+}
+
+.client-avatar {
+  width: 50px;
+  height: 50px;
+  background-color: #ccc;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.client-card .field-label {
+  color: #666;
+  margin-right: 4px;
+}
+
+.client-card .field-value {
+  color: #333; 
+  font-weight: normal;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 10px;
+}
   
